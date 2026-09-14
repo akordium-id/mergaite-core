@@ -114,6 +114,7 @@ make test
 Comprehensive guides and architectural specifications are available in the [`docs/`](docs/) directory:
 - [Architecture Overview](docs/architecture.md)
 - [Domain Primitives & Value Objects](docs/domain-primitives.md)
+- [Organization & Party Model](docs/organization-and-party.md)
 - [Getting Started & Local Development](docs/getting-started.md)
 
 ---

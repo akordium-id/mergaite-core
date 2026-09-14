@@ -16,7 +16,9 @@ import (
 )
 
 type Handlers struct {
-	TenantHandler *v1.TenantHandler
+	TenantHandler       *v1.TenantHandler
+	OrganizationHandler *v1.OrganizationHandler
+	PartyHandler        *v1.PartyHandler
 }
 
 // NewRouter constructs the Chi router with middleware and routes.
@@ -62,6 +64,8 @@ func NewRouter(db *pgxpool.Pool, handlers Handlers) http.Handler {
 	// API v1 routes
 	r.Route("/api/v1", func(r chi.Router) {
 		handlers.TenantHandler.RegisterRoutes(r)
+		handlers.OrganizationHandler.RegisterRoutes(r)
+		handlers.PartyHandler.RegisterRoutes(r)
 	})
 
 	return r

@@ -8,6 +8,94 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Address struct {
+	ID          pgtype.UUID        `json:"id"`
+	TenantID    pgtype.UUID        `json:"tenant_id"`
+	Type        string             `json:"type"`
+	Label       *string            `json:"label"`
+	Line1       string             `json:"line1"`
+	Line2       *string            `json:"line2"`
+	City        string             `json:"city"`
+	State       *string            `json:"state"`
+	PostalCode  *string            `json:"postal_code"`
+	CountryCode string             `json:"country_code"`
+	Latitude    pgtype.Numeric     `json:"latitude"`
+	Longitude   pgtype.Numeric     `json:"longitude"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Contact struct {
+	ID             pgtype.UUID        `json:"id"`
+	TenantID       pgtype.UUID        `json:"tenant_id"`
+	PartyID        pgtype.UUID        `json:"party_id"`
+	OrganizationID pgtype.UUID        `json:"organization_id"`
+	Type           string             `json:"type"`
+	Value          string             `json:"value"`
+	Label          *string            `json:"label"`
+	IsPrimary      bool               `json:"is_primary"`
+	VerifiedAt     pgtype.Timestamptz `json:"verified_at"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Organization struct {
+	ID        pgtype.UUID        `json:"id"`
+	TenantID  pgtype.UUID        `json:"tenant_id"`
+	ParentID  pgtype.UUID        `json:"parent_id"`
+	Code      string             `json:"code"`
+	Name      string             `json:"name"`
+	LegalName *string            `json:"legal_name"`
+	Type      string             `json:"type"`
+	Status    string             `json:"status"`
+	Settings  []byte             `json:"settings"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type OrganizationAddress struct {
+	TenantID       pgtype.UUID        `json:"tenant_id"`
+	OrganizationID pgtype.UUID        `json:"organization_id"`
+	AddressID      pgtype.UUID        `json:"address_id"`
+	AddressType    string             `json:"address_type"`
+	IsPrimary      bool               `json:"is_primary"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+}
+
+type Party struct {
+	ID        pgtype.UUID        `json:"id"`
+	TenantID  pgtype.UUID        `json:"tenant_id"`
+	Type      string             `json:"type"`
+	Code      *string            `json:"code"`
+	Name      string             `json:"name"`
+	LegalName *string            `json:"legal_name"`
+	TaxID     *string            `json:"tax_id"`
+	Status    string             `json:"status"`
+	Metadata  []byte             `json:"metadata"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type PartyAddress struct {
+	TenantID    pgtype.UUID        `json:"tenant_id"`
+	PartyID     pgtype.UUID        `json:"party_id"`
+	AddressID   pgtype.UUID        `json:"address_id"`
+	AddressType string             `json:"address_type"`
+	IsPrimary   bool               `json:"is_primary"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+}
+
+type PartyRole struct {
+	ID             pgtype.UUID        `json:"id"`
+	TenantID       pgtype.UUID        `json:"tenant_id"`
+	PartyID        pgtype.UUID        `json:"party_id"`
+	OrganizationID pgtype.UUID        `json:"organization_id"`
+	RoleType       string             `json:"role_type"`
+	Status         string             `json:"status"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Tenant struct {
 	ID        pgtype.UUID        `json:"id"`
 	Code      string             `json:"code"`

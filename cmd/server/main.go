@@ -14,6 +14,8 @@ import (
 	deliveryhttp "github.com/akordium-id/mergaite-core/internal/core/delivery/http"
 	v1 "github.com/akordium-id/mergaite-core/internal/core/delivery/http/v1"
 	"github.com/akordium-id/mergaite-core/internal/core/repository/postgres"
+	"github.com/akordium-id/mergaite-core/internal/core/usecase/organization"
+	"github.com/akordium-id/mergaite-core/internal/core/usecase/party"
 	"github.com/akordium-id/mergaite-core/internal/core/usecase/tenant"
 	"github.com/akordium-id/mergaite-core/pkg/config"
 	"github.com/akordium-id/mergaite-core/pkg/database"
@@ -51,12 +53,23 @@ func main() {
 	}
 
 	// Layer Wiring (Clean Architecture)
-	var tenantRepo = postgres.NewTenantRepository(dbPool)
+	tenantRepo := postgres.NewTenantRepository(dbPool)
+	orgRepo := postgres.NewOrganizationRepository(dbPool)
+	partyRepo := postgres.NewPartyRepository(dbPool)
+	contactRepo := postgres.NewAddressContactRepository(dbPool)
+
 	tenantUsecase := tenant.NewUsecase(tenantRepo)
+	orgUsecase := organization.NewUsecase(orgRepo)
+	partyUsecase := party.NewUsecase(partyRepo, contactRepo)
+
 	tenantHandler := v1.NewTenantHandler(tenantUsecase)
+	orgHandler := v1.NewOrganizationHandler(orgUsecase)
+	partyHandler := v1.NewPartyHandler(partyUsecase)
 
 	handlers := deliveryhttp.Handlers{
-		TenantHandler: tenantHandler,
+		TenantHandler:       tenantHandler,
+		OrganizationHandler: orgHandler,
+		PartyHandler:        partyHandler,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)
