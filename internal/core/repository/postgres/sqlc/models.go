@@ -125,6 +125,28 @@ type EntityCustomField struct {
 	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
 }
 
+type NumberSequence struct {
+	ID           pgtype.UUID        `json:"id"`
+	TenantID     pgtype.UUID        `json:"tenant_id"`
+	Code         string             `json:"code"`
+	Name         string             `json:"name"`
+	EntityType   string             `json:"entity_type"`
+	SubType      string             `json:"sub_type"`
+	Prefix       string             `json:"prefix"`
+	Suffix       string             `json:"suffix"`
+	Template     string             `json:"template"`
+	Padding      int32              `json:"padding"`
+	StartValue   int64              `json:"start_value"`
+	IncrementBy  int32              `json:"increment_by"`
+	CurrentValue int64              `json:"current_value"`
+	ResetPolicy  string             `json:"reset_policy"`
+	LastNumber   *string            `json:"last_number"`
+	LastResetAt  pgtype.Timestamptz `json:"last_reset_at"`
+	IsActive     bool               `json:"is_active"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Organization struct {
 	ID        pgtype.UUID        `json:"id"`
 	TenantID  pgtype.UUID        `json:"tenant_id"`

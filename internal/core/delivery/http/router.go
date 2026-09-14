@@ -25,6 +25,7 @@ type Handlers struct {
 	AuthHandler         *v1.AuthHandler
 	IdentityHandler     *v1.IdentityHandler
 	CustomFieldHandler  *v1.CustomFieldHandler
+	SequenceHandler     *v1.SequenceHandler
 }
 
 // NewRouter constructs the Chi router with middleware and routes.
@@ -33,7 +34,7 @@ func NewRouter(db *pgxpool.Pool, handlers Handlers) http.Handler {
 
 	// Global Middleware
 	r.Use(chimiddleware.RequestID)
-	r.Use(chimiddleware.RealIP)
+	r.Use(chimiddleware.ClientIPFromHeader("X-Real-IP"))
 	r.Use(middleware.RequestLogger())
 	r.Use(chimiddleware.Recoverer)
 	r.Use(cors.Handler(cors.Options{
@@ -77,6 +78,9 @@ func NewRouter(db *pgxpool.Pool, handlers Handlers) http.Handler {
 		}
 		if handlers.CustomFieldHandler != nil {
 			handlers.CustomFieldHandler.RegisterRoutes(r)
+		}
+		if handlers.SequenceHandler != nil {
+			handlers.SequenceHandler.RegisterRoutes(r)
 		}
 		handlers.TenantHandler.RegisterRoutes(r)
 		handlers.OrganizationHandler.RegisterRoutes(r)

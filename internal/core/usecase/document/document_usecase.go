@@ -10,6 +10,7 @@ import (
 	"github.com/akordium-id/mergiate-core/internal/core/domain/document"
 	"github.com/akordium-id/mergiate-core/internal/core/domain/event"
 	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/usecase/sequence"
 )
 
 type CreateDocumentLineInput struct {
@@ -60,13 +61,19 @@ type usecase struct {
 	docRepo    document.Repository
 	auditRepo  audit.Repository
 	outboxRepo event.OutboxRepository
+	seqUsecase sequence.Usecase
 }
 
-func NewUsecase(docRepo document.Repository, auditRepo audit.Repository, outboxRepo event.OutboxRepository) Usecase {
+func NewUsecase(docRepo document.Repository, auditRepo audit.Repository, outboxRepo event.OutboxRepository, seqUsecase ...sequence.Usecase) Usecase {
+	var seqUc sequence.Usecase
+	if len(seqUsecase) > 0 {
+		seqUc = seqUsecase[0]
+	}
 	return &usecase{
 		docRepo:    docRepo,
 		auditRepo:  auditRepo,
 		outboxRepo: outboxRepo,
+		seqUsecase: seqUc,
 	}
 }
 
@@ -92,8 +99,23 @@ func (u *usecase) CreateDocument(ctx context.Context, cmd CreateDocumentCommand)
 
 	docNum := strings.TrimSpace(cmd.DocumentNumber)
 	if docNum == "" {
-		prefix := strings.ToUpper(string(docType))
-		docNum = fmt.Sprintf("%s-%s-%s", prefix, time.Now().Format("20060102"), docID.String()[:8])
+		// Attempt to acquire next number from sequence engine
+		if u.seqUsecase != nil {
+			generated, err := u.seqUsecase.AcquireNextNumber(ctx, sequence.AcquireNextCommand{
+				TenantID:   tenantID,
+				EntityType: "document",
+				SubType:    string(docType),
+			})
+			if err == nil && generated != "" {
+				docNum = generated
+			}
+		}
+
+		// Fallback default format if no sequence defined
+		if docNum == "" {
+			prefix := strings.ToUpper(string(docType))
+			docNum = fmt.Sprintf("%s-%s-%s", prefix, time.Now().Format("20060102"), docID.String()[:8])
+		}
 	}
 
 	// Ensure document number uniqueness within tenant + doc_type

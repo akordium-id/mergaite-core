@@ -21,6 +21,7 @@ import (
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/organization"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/party"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/product"
+	sequenceusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/sequence"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/tenant"
 	"github.com/akordium-id/mergiate-core/internal/core/worker"
 	"github.com/akordium-id/mergiate-core/pkg/auth"
@@ -72,6 +73,7 @@ func main() {
 	outboxRepo := postgres.NewOutboxRepository(dbPool)
 	identityRepo := postgres.NewIdentityRepository(dbPool)
 	customFieldRepo := postgres.NewCustomFieldRepository(dbPool)
+	sequenceRepo := postgres.NewSequenceRepository(dbPool)
 
 	// Auth & Security Token Manager
 	tokenMgr := auth.NewTokenManager(cfg.JWTSecret, cfg.AppName)
@@ -88,7 +90,8 @@ func main() {
 	orgUsecase := organization.NewUsecase(orgRepo)
 	partyUsecase := party.NewUsecase(partyRepo, contactRepo)
 	productUsecase := product.NewUsecase(unitRepo, productRepo)
-	docUsecase := document.NewUsecase(docRepo, auditRepo, outboxRepo)
+	sequenceUsecase := sequenceusecase.NewUsecase(sequenceRepo)
+	docUsecase := document.NewUsecase(docRepo, auditRepo, outboxRepo, sequenceUsecase)
 	auditUsecase := audit.NewUsecase(auditRepo)
 	identityUsecase := identityusecase.NewUsecase(identityRepo, tenantRepo, tokenMgr, cfg.JWTExpiry)
 	customFieldUsecase := customfieldusecase.NewUsecase(customFieldRepo)
@@ -102,6 +105,7 @@ func main() {
 	authHandler := v1.NewAuthHandler(identityUsecase, tokenMgr)
 	identityHandler := v1.NewIdentityHandler(identityUsecase, tokenMgr)
 	customFieldHandler := v1.NewCustomFieldHandler(customFieldUsecase, tokenMgr)
+	sequenceHandler := v1.NewSequenceHandler(sequenceUsecase, tokenMgr)
 
 	handlers := deliveryhttp.Handlers{
 		TenantHandler:       tenantHandler,
@@ -113,6 +117,7 @@ func main() {
 		AuthHandler:         authHandler,
 		IdentityHandler:     identityHandler,
 		CustomFieldHandler:  customFieldHandler,
+		SequenceHandler:     sequenceHandler,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)

@@ -21,12 +21,17 @@ func RequestLogger() func(next http.Handler) http.Handler {
 				latency := time.Since(start)
 				tenantID, _ := shared.GetTenantID(r.Context())
 
+				ip := middleware.GetClientIP(r.Context())
+				if ip == "" {
+					ip = r.RemoteAddr
+				}
+
 				attrs := []any{
 					slog.String("method", r.Method),
 					slog.String("path", r.URL.Path),
 					slog.Int("status", ww.Status()),
 					slog.Duration("latency", latency),
-					slog.String("ip", r.RemoteAddr),
+					slog.String("ip", ip),
 				}
 
 				if tenantID != shared.NilID() {

@@ -8,8 +8,10 @@ import (
 	domainaudit "github.com/akordium-id/mergiate-core/internal/core/domain/audit"
 	domaindoc "github.com/akordium-id/mergiate-core/internal/core/domain/document"
 	domainevent "github.com/akordium-id/mergiate-core/internal/core/domain/event"
+	domainseq "github.com/akordium-id/mergiate-core/internal/core/domain/sequence"
 	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 	usecasedoc "github.com/akordium-id/mergiate-core/internal/core/usecase/document"
+	usecaseseq "github.com/akordium-id/mergiate-core/internal/core/usecase/sequence"
 )
 
 type mockDocRepo struct {
@@ -335,3 +337,56 @@ func TestDocumentUsecase_AuditAndOutboxIntegration(t *testing.T) {
 		t.Errorf("expected event_type 'document.transitioned', got '%s'", outboxRepo.events[1].EventType)
 	}
 }
+
+type mockSeqUsecase struct {
+	nextNumber string
+}
+
+func (m *mockSeqUsecase) CreateSequence(ctx context.Context, cmd usecaseseq.CreateSequenceCommand) (*domainseq.Sequence, error) {
+	return nil, nil
+}
+func (m *mockSeqUsecase) GetSequence(ctx context.Context, tenantID, id shared.ID) (*domainseq.Sequence, error) {
+	return nil, nil
+}
+func (m *mockSeqUsecase) GetSequenceByEntity(ctx context.Context, tenantID shared.ID, entityType, subType string) (*domainseq.Sequence, error) {
+	return nil, nil
+}
+func (m *mockSeqUsecase) ListSequences(ctx context.Context, tenantID shared.ID) ([]domainseq.Sequence, error) {
+	return nil, nil
+}
+func (m *mockSeqUsecase) UpdateSequence(ctx context.Context, cmd usecaseseq.UpdateSequenceCommand) (*domainseq.Sequence, error) {
+	return nil, nil
+}
+func (m *mockSeqUsecase) DeleteSequence(ctx context.Context, tenantID, id shared.ID) error {
+	return nil
+}
+func (m *mockSeqUsecase) AcquireNextNumber(ctx context.Context, cmd usecaseseq.AcquireNextCommand) (string, error) {
+	return m.nextNumber, nil
+}
+func (m *mockSeqUsecase) PreviewNextNumber(ctx context.Context, cmd usecaseseq.PreviewCommand) (string, error) {
+	return m.nextNumber, nil
+}
+
+func TestDocumentUsecase_AutoNumberingIntegration(t *testing.T) {
+	repo := newMockDocRepo()
+	mockSeq := &mockSeqUsecase{nextNumber: "QUO/2026/09/0042"}
+	uc := usecasedoc.NewUsecase(repo, nil, nil, mockSeq)
+
+	tenantID, _ := shared.NewID()
+	orgID, _ := shared.NewID()
+	ctx := shared.WithTenantID(context.Background(), tenantID)
+
+	doc, err := uc.CreateDocument(ctx, usecasedoc.CreateDocumentCommand{
+		OrganizationID: orgID,
+		DocumentType:   domaindoc.DocTypeQuotation,
+		// DocumentNumber is left empty to trigger sequence auto-numbering
+	})
+	if err != nil {
+		t.Fatalf("unexpected error creating document: %v", err)
+	}
+
+	if doc.DocumentNumber != "QUO/2026/09/0042" {
+		t.Errorf("expected auto-numbered 'QUO/2026/09/0042', got '%s'", doc.DocumentNumber)
+	}
+}
+
