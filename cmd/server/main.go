@@ -30,6 +30,7 @@ import (
 	"github.com/akordium-id/mergiate-core/pkg/config"
 	"github.com/akordium-id/mergiate-core/pkg/database"
 	"github.com/akordium-id/mergiate-core/pkg/eventbus"
+	"github.com/akordium-id/mergiate-core/pkg/module"
 	"github.com/akordium-id/mergiate-core/pkg/storage/local"
 )
 
@@ -123,6 +124,20 @@ func main() {
 	attachmentHandler := v1.NewAttachmentHandler(attachmentUsecase, tokenMgr)
 	commHandler := v1.NewCommunicationHandler(commUsecase, tokenMgr)
 
+	// Module SPI & Plugin Engine
+	moduleHost := module.NewHost(dbPool, bus, storageDriver, tokenMgr, outboxRepo, logger)
+	moduleRegistry := module.NewRegistry(moduleHost, logger)
+
+	// Note: External modules are registered to moduleRegistry before InitAll
+	if err := moduleRegistry.InitAll(context.Background()); err != nil {
+		slog.Error("failed to initialize modules", slog.Any("error", err))
+		os.Exit(1)
+	}
+	if err := moduleRegistry.RegisterPermissions(context.Background()); err != nil {
+		slog.Warn("failed to register module permissions", slog.Any("error", err))
+	}
+	moduleRegistry.BindSubscriptions()
+
 	handlers := deliveryhttp.Handlers{
 		TenantHandler:        tenantHandler,
 		OrganizationHandler:  orgHandler,
@@ -136,6 +151,7 @@ func main() {
 		SequenceHandler:      sequenceHandler,
 		AttachmentHandler:    attachmentHandler,
 		CommunicationHandler: commHandler,
+		ModuleRegistry:       moduleRegistry,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)
@@ -161,6 +177,10 @@ func main() {
 
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer shutdownCancel()
+
+		if err := moduleRegistry.ShutdownAll(shutdownCtx); err != nil {
+			slog.Error("error during module shutdown", slog.Any("error", err))
+		}
 
 		shutdownErrChan <- server.Shutdown(shutdownCtx)
 	}()

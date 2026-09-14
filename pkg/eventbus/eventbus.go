@@ -10,6 +10,22 @@ import (
 	"github.com/akordium-id/mergiate-core/internal/core/domain/event"
 )
 
+// Re-export event domain types for public consumers and external modules.
+type (
+	Bus       = event.Bus
+	Handler   = event.Handler
+	Event     = event.Event
+	BaseEvent = event.BaseEvent
+)
+
+// NewBaseEvent creates a new BaseEvent for publishing through the bus.
+var NewBaseEvent = event.NewBaseEvent
+
+// New constructs a thread-safe in-memory event bus.
+func New() Bus {
+	return NewInMemoryBus()
+}
+
 type inMemoryBus struct {
 	mu       sync.RWMutex
 	handlers map[string][]event.Handler

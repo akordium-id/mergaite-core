@@ -122,6 +122,7 @@ Comprehensive guides and architectural specifications are available in the [`doc
 - [Document Numbering & Sequence Engine](docs/document-sequences.md)
 - [File & Attachment Engine](docs/file-and-attachment.md)
 - [Communication & Activity Timeline](docs/communication-and-notifications.md)
+- [Module & Plugin SPI Engine](docs/module-plugin-system.md)
 - [Getting Started & Local Development](docs/getting-started.md)
 
 ---

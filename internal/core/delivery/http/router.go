@@ -12,22 +12,24 @@ import (
 
 	"github.com/akordium-id/mergiate-core/internal/core/delivery/http/middleware"
 	v1 "github.com/akordium-id/mergiate-core/internal/core/delivery/http/v1"
+	"github.com/akordium-id/mergiate-core/pkg/module"
 	"github.com/akordium-id/mergiate-core/pkg/response"
 )
 
 type Handlers struct {
-	TenantHandler       *v1.TenantHandler
-	OrganizationHandler *v1.OrganizationHandler
-	PartyHandler        *v1.PartyHandler
-	ProductHandler      *v1.ProductHandler
-	DocumentHandler     *v1.DocumentHandler
-	AuditHandler        *v1.AuditHandler
-	AuthHandler         *v1.AuthHandler
-	IdentityHandler     *v1.IdentityHandler
-	CustomFieldHandler  *v1.CustomFieldHandler
-	SequenceHandler     *v1.SequenceHandler
-	AttachmentHandler   *v1.AttachmentHandler
+	TenantHandler        *v1.TenantHandler
+	OrganizationHandler  *v1.OrganizationHandler
+	PartyHandler         *v1.PartyHandler
+	ProductHandler       *v1.ProductHandler
+	DocumentHandler      *v1.DocumentHandler
+	AuditHandler         *v1.AuditHandler
+	AuthHandler          *v1.AuthHandler
+	IdentityHandler      *v1.IdentityHandler
+	CustomFieldHandler   *v1.CustomFieldHandler
+	SequenceHandler      *v1.SequenceHandler
+	AttachmentHandler    *v1.AttachmentHandler
 	CommunicationHandler *v1.CommunicationHandler
+	ModuleRegistry       *module.Registry
 }
 
 // NewRouter constructs the Chi router with middleware and routes.
@@ -89,6 +91,9 @@ func NewRouter(db *pgxpool.Pool, handlers Handlers) http.Handler {
 		}
 		if handlers.CommunicationHandler != nil {
 			handlers.CommunicationHandler.RegisterRoutes(r)
+		}
+		if handlers.ModuleRegistry != nil {
+			handlers.ModuleRegistry.MountRoutes(r)
 		}
 		handlers.TenantHandler.RegisterRoutes(r)
 		handlers.OrganizationHandler.RegisterRoutes(r)
