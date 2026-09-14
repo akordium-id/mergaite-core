@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS document_transitions CASCADE;
+DROP TABLE IF EXISTS document_lines CASCADE;
+DROP TABLE IF EXISTS documents CASCADE;

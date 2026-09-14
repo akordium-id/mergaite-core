@@ -39,6 +39,51 @@ type Contact struct {
 	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }
 
+type Document struct {
+	ID             pgtype.UUID        `json:"id"`
+	TenantID       pgtype.UUID        `json:"tenant_id"`
+	OrganizationID pgtype.UUID        `json:"organization_id"`
+	DocumentType   string             `json:"document_type"`
+	DocumentNumber string             `json:"document_number"`
+	DocumentDate   pgtype.Date        `json:"document_date"`
+	PartyID        pgtype.UUID        `json:"party_id"`
+	Status         string             `json:"status"`
+	TotalAmount    int64              `json:"total_amount"`
+	Currency       string             `json:"currency"`
+	Notes          *string            `json:"notes"`
+	Metadata       []byte             `json:"metadata"`
+	CreatedBy      pgtype.UUID        `json:"created_by"`
+	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
+}
+
+type DocumentLine struct {
+	ID          pgtype.UUID        `json:"id"`
+	TenantID    pgtype.UUID        `json:"tenant_id"`
+	DocumentID  pgtype.UUID        `json:"document_id"`
+	LineNumber  int32              `json:"line_number"`
+	ProductID   pgtype.UUID        `json:"product_id"`
+	Description string             `json:"description"`
+	Quantity    pgtype.Numeric     `json:"quantity"`
+	UnitID      pgtype.UUID        `json:"unit_id"`
+	UnitPrice   int64              `json:"unit_price"`
+	Subtotal    int64              `json:"subtotal"`
+	Metadata    []byte             `json:"metadata"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type DocumentTransition struct {
+	ID         pgtype.UUID        `json:"id"`
+	TenantID   pgtype.UUID        `json:"tenant_id"`
+	DocumentID pgtype.UUID        `json:"document_id"`
+	FromStatus string             `json:"from_status"`
+	ToStatus   string             `json:"to_status"`
+	Reason     *string            `json:"reason"`
+	ActorID    pgtype.UUID        `json:"actor_id"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
 type Organization struct {
 	ID        pgtype.UUID        `json:"id"`
 	TenantID  pgtype.UUID        `json:"tenant_id"`
@@ -96,6 +141,33 @@ type PartyRole struct {
 	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }
 
+type Product struct {
+	ID          pgtype.UUID        `json:"id"`
+	TenantID    pgtype.UUID        `json:"tenant_id"`
+	Type        string             `json:"type"`
+	Sku         *string            `json:"sku"`
+	Barcode     *string            `json:"barcode"`
+	Name        string             `json:"name"`
+	Description *string            `json:"description"`
+	UnitID      pgtype.UUID        `json:"unit_id"`
+	Status      string             `json:"status"`
+	Metadata    []byte             `json:"metadata"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type ProductVariant struct {
+	ID         pgtype.UUID        `json:"id"`
+	TenantID   pgtype.UUID        `json:"tenant_id"`
+	ProductID  pgtype.UUID        `json:"product_id"`
+	Sku        string             `json:"sku"`
+	Name       string             `json:"name"`
+	Attributes []byte             `json:"attributes"`
+	Status     string             `json:"status"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Tenant struct {
 	ID        pgtype.UUID        `json:"id"`
 	Code      string             `json:"code"`
@@ -104,4 +176,27 @@ type Tenant struct {
 	Settings  []byte             `json:"settings"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Unit struct {
+	ID        pgtype.UUID        `json:"id"`
+	TenantID  pgtype.UUID        `json:"tenant_id"`
+	Code      string             `json:"code"`
+	Name      string             `json:"name"`
+	Symbol    string             `json:"symbol"`
+	Category  string             `json:"category"`
+	Precision int32              `json:"precision"`
+	Status    string             `json:"status"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type UnitConversion struct {
+	ID         pgtype.UUID        `json:"id"`
+	TenantID   pgtype.UUID        `json:"tenant_id"`
+	FromUnitID pgtype.UUID        `json:"from_unit_id"`
+	ToUnitID   pgtype.UUID        `json:"to_unit_id"`
+	Factor     pgtype.Numeric     `json:"factor"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
 }
