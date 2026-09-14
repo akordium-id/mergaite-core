@@ -18,6 +18,8 @@ type Config struct {
 	DBMinConns     int32
 	DBMaxConnIdle  time.Duration
 	DBMaxConnLife  time.Duration
+	JWTSecret      string
+	JWTExpiry      time.Duration
 }
 
 func Load() (*Config, error) {
@@ -44,6 +46,13 @@ func Load() (*Config, error) {
 	maxConns := getEnvAsInt32("DB_MAX_CONNS", 25)
 	minConns := getEnvAsInt32("DB_MIN_CONNS", 5)
 
+	jwtSecret := getEnv("JWT_SECRET", "mergiate-insecure-secret-key-change-in-production")
+	jwtExpiryStr := getEnv("JWT_EXPIRY", "24h")
+	jwtExpiry, err := time.ParseDuration(jwtExpiryStr)
+	if err != nil {
+		jwtExpiry = 24 * time.Hour
+	}
+
 	return &Config{
 		AppEnv:        appEnv,
 		AppPort:       appPort,
@@ -53,6 +62,8 @@ func Load() (*Config, error) {
 		DBMinConns:    minConns,
 		DBMaxConnIdle: 15 * time.Minute,
 		DBMaxConnLife: 1 * time.Hour,
+		JWTSecret:     jwtSecret,
+		JWTExpiry:     jwtExpiry,
 	}, nil
 }
 

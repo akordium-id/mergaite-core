@@ -117,6 +117,7 @@ Comprehensive guides and architectural specifications are available in the [`doc
 - [Organization & Party Model](docs/organization-and-party.md)
 - [Product & Document Engine](docs/product-and-document.md)
 - [Audit Trail & Outbox Engine](docs/audit-and-event-outbox.md)
+- [Identity & Access Management (RBAC)](docs/identity-and-access.md)
 - [Getting Started & Local Development](docs/getting-started.md)
 
 ---

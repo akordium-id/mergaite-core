@@ -16,11 +16,13 @@ import (
 	"github.com/akordium-id/mergiate-core/internal/core/repository/postgres"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/audit"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/document"
+	identityusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/identity"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/organization"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/party"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/product"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/tenant"
 	"github.com/akordium-id/mergiate-core/internal/core/worker"
+	"github.com/akordium-id/mergiate-core/pkg/auth"
 	"github.com/akordium-id/mergiate-core/pkg/config"
 	"github.com/akordium-id/mergiate-core/pkg/database"
 	"github.com/akordium-id/mergiate-core/pkg/eventbus"
@@ -67,6 +69,10 @@ func main() {
 	docRepo := postgres.NewDocumentRepository(dbPool)
 	auditRepo := postgres.NewAuditRepository(dbPool)
 	outboxRepo := postgres.NewOutboxRepository(dbPool)
+	identityRepo := postgres.NewIdentityRepository(dbPool)
+
+	// Auth & Security Token Manager
+	tokenMgr := auth.NewTokenManager(cfg.JWTSecret, cfg.AppName)
 
 	// Event Bus & Background Outbox Worker
 	bus := eventbus.NewInMemoryBus()
@@ -82,6 +88,7 @@ func main() {
 	productUsecase := product.NewUsecase(unitRepo, productRepo)
 	docUsecase := document.NewUsecase(docRepo, auditRepo, outboxRepo)
 	auditUsecase := audit.NewUsecase(auditRepo)
+	identityUsecase := identityusecase.NewUsecase(identityRepo, tenantRepo, tokenMgr, cfg.JWTExpiry)
 
 	tenantHandler := v1.NewTenantHandler(tenantUsecase)
 	orgHandler := v1.NewOrganizationHandler(orgUsecase)
@@ -89,6 +96,8 @@ func main() {
 	productHandler := v1.NewProductHandler(productUsecase)
 	docHandler := v1.NewDocumentHandler(docUsecase)
 	auditHandler := v1.NewAuditHandler(auditUsecase)
+	authHandler := v1.NewAuthHandler(identityUsecase, tokenMgr)
+	identityHandler := v1.NewIdentityHandler(identityUsecase, tokenMgr)
 
 	handlers := deliveryhttp.Handlers{
 		TenantHandler:       tenantHandler,
@@ -97,6 +106,8 @@ func main() {
 		ProductHandler:      productHandler,
 		DocumentHandler:     docHandler,
 		AuditHandler:        auditHandler,
+		AuthHandler:         authHandler,
+		IdentityHandler:     identityHandler,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)

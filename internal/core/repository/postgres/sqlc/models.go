@@ -168,6 +168,14 @@ type PartyRole struct {
 	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }
 
+type Permission struct {
+	ID          pgtype.UUID `json:"id"`
+	Code        string      `json:"code"`
+	Name        string      `json:"name"`
+	Category    string      `json:"category"`
+	Description *string     `json:"description"`
+}
+
 type Product struct {
 	ID          pgtype.UUID        `json:"id"`
 	TenantID    pgtype.UUID        `json:"tenant_id"`
@@ -195,6 +203,22 @@ type ProductVariant struct {
 	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
 }
 
+type Role struct {
+	ID          pgtype.UUID        `json:"id"`
+	TenantID    pgtype.UUID        `json:"tenant_id"`
+	Code        string             `json:"code"`
+	Name        string             `json:"name"`
+	Description *string            `json:"description"`
+	IsSystem    bool               `json:"is_system"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+}
+
+type RolePermission struct {
+	RoleID       pgtype.UUID `json:"role_id"`
+	PermissionID pgtype.UUID `json:"permission_id"`
+}
+
 type Tenant struct {
 	ID        pgtype.UUID        `json:"id"`
 	Code      string             `json:"code"`
@@ -203,6 +227,14 @@ type Tenant struct {
 	Settings  []byte             `json:"settings"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type TenantUser struct {
+	ID       pgtype.UUID        `json:"id"`
+	TenantID pgtype.UUID        `json:"tenant_id"`
+	UserID   pgtype.UUID        `json:"user_id"`
+	Status   string             `json:"status"`
+	JoinedAt pgtype.Timestamptz `json:"joined_at"`
 }
 
 type Unit struct {
@@ -226,4 +258,20 @@ type UnitConversion struct {
 	Factor     pgtype.Numeric     `json:"factor"`
 	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+}
+
+type User struct {
+	ID           pgtype.UUID        `json:"id"`
+	Email        string             `json:"email"`
+	PasswordHash string             `json:"password_hash"`
+	Name         string             `json:"name"`
+	Status       string             `json:"status"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt    pgtype.Timestamptz `json:"updated_at"`
+}
+
+type UserRole struct {
+	TenantID pgtype.UUID `json:"tenant_id"`
+	UserID   pgtype.UUID `json:"user_id"`
+	RoleID   pgtype.UUID `json:"role_id"`
 }
