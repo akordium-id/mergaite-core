@@ -42,8 +42,8 @@ func (b *inMemoryBus) Publish(ctx context.Context, evt event.Event) error {
 	for pattern, hList := range b.handlers {
 		if pattern == "*" {
 			targets = append(targets, hList...)
-		} else if strings.HasSuffix(pattern, ".*") {
-			prefix := strings.TrimSuffix(pattern, ".*")
+		} else if before, ok := strings.CutSuffix(pattern, ".*"); ok {
+			prefix := before
 			if strings.HasPrefix(evt.EventType(), prefix+".") {
 				targets = append(targets, hList...)
 			}

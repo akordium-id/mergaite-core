@@ -178,8 +178,7 @@ func TestOutboxWorker_StartAndTrigger(t *testing.T) {
 		MaxRetries:   3,
 	})
 
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	ctx := t.Context()
 
 	go w.Start(ctx)
 
