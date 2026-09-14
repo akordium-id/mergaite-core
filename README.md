@@ -123,6 +123,7 @@ Comprehensive guides and architectural specifications are available in the [`doc
 - [File & Attachment Engine](docs/file-and-attachment.md)
 - [Communication & Activity Timeline](docs/communication-and-notifications.md)
 - [Module & Plugin SPI Engine](docs/module-plugin-system.md)
+- [M2M API Keys & Service Accounts](docs/service-accounts-and-api-keys.md)
 - [Getting Started & Local Development](docs/getting-started.md)
 
 ---

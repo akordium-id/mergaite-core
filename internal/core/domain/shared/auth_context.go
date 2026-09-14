@@ -2,14 +2,25 @@ package shared
 
 import "context"
 
-// AuthClaims holds the authenticated user credentials and RBAC permissions in context.
+type ActorType string
+
+const (
+	ActorTypeUser   ActorType = "user"
+	ActorTypeAPIKey ActorType = "api_key"
+	ActorTypeSystem ActorType = "system"
+)
+
+// AuthClaims holds the authenticated user or service account credentials and RBAC permissions in context.
 type AuthClaims struct {
-	UserID      ID       `json:"user_id"`
-	TenantID    ID       `json:"tenant_id"`
-	Email       string   `json:"email"`
-	Name        string   `json:"name"`
-	Roles       []string `json:"roles"`
-	Permissions []string `json:"permissions"`
+	UserID           ID        `json:"user_id"`
+	TenantID         ID        `json:"tenant_id"`
+	Email            string    `json:"email"`
+	Name             string    `json:"name"`
+	Roles            []string  `json:"roles"`
+	Permissions      []string  `json:"permissions"`
+	ActorType        ActorType `json:"actor_type,omitempty"`
+	ServiceAccountID *ID       `json:"service_account_id,omitempty"`
+	APIKeyID         *ID       `json:"api_key_id,omitempty"`
 }
 
 type authContextKey string

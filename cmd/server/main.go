@@ -80,6 +80,7 @@ func main() {
 	sequenceRepo := postgres.NewSequenceRepository(dbPool)
 	attachmentRepo := postgres.NewAttachmentRepository(dbPool)
 	commRepo := postgres.NewCommunicationRepository(dbPool)
+	serviceAccountRepo := postgres.NewServiceAccountRepository(dbPool)
 
 	// Pluggable Storage Driver
 	storageDriver, err := local.NewDriver("./storage/uploads")
@@ -110,6 +111,7 @@ func main() {
 	customFieldUsecase := customfieldusecase.NewUsecase(customFieldRepo)
 	attachmentUsecase := attachmentusecase.NewUsecase(attachmentRepo, storageDriver)
 	commUsecase := commusecase.NewUsecase(commRepo, auditRepo, attachmentRepo, outboxRepo)
+	serviceAccountUsecase := identityusecase.NewServiceAccountUsecase(serviceAccountRepo)
 
 	tenantHandler := v1.NewTenantHandler(tenantUsecase)
 	orgHandler := v1.NewOrganizationHandler(orgUsecase)
@@ -123,6 +125,7 @@ func main() {
 	sequenceHandler := v1.NewSequenceHandler(sequenceUsecase, tokenMgr)
 	attachmentHandler := v1.NewAttachmentHandler(attachmentUsecase, tokenMgr)
 	commHandler := v1.NewCommunicationHandler(commUsecase, tokenMgr)
+	serviceAccountHandler := v1.NewServiceAccountHandler(serviceAccountUsecase, tokenMgr)
 
 	// Module SPI & Plugin Engine
 	moduleHost := module.NewHost(dbPool, bus, storageDriver, tokenMgr, outboxRepo, logger)
@@ -149,9 +152,12 @@ func main() {
 		IdentityHandler:      identityHandler,
 		CustomFieldHandler:   customFieldHandler,
 		SequenceHandler:      sequenceHandler,
-		AttachmentHandler:    attachmentHandler,
-		CommunicationHandler: commHandler,
-		ModuleRegistry:       moduleRegistry,
+		AttachmentHandler:     attachmentHandler,
+		CommunicationHandler:  commHandler,
+		ServiceAccountHandler: serviceAccountHandler,
+		ModuleRegistry:        moduleRegistry,
+		TokenManager:          tokenMgr,
+		ApiKeyValidator:       serviceAccountUsecase,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)

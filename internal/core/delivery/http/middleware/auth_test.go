@@ -1,6 +1,8 @@
 package middleware_test
 
 import (
+	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -133,4 +135,92 @@ func TestRequirePermissionMiddleware(t *testing.T) {
 			}
 		})
 	}
+}
+
+type mockKeyValidator struct {
+	validKey string
+	claims   *shared.AuthClaims
+	err      error
+}
+
+func (m *mockKeyValidator) ValidateAPIKey(ctx context.Context, rawKey, clientIP string) (*shared.AuthClaims, error) {
+	if rawKey == m.validKey {
+		return m.claims, nil
+	}
+	return nil, m.err
+}
+
+func TestAuthRequiredMiddleware_M2M(t *testing.T) {
+	tokenMgr := auth.NewTokenManager("test-secret-key-1234567890", "test-issuer")
+	saID := shared.MustNewID()
+	tenantID := shared.MustNewID()
+
+	validator := &mockKeyValidator{
+		validKey: "mrg_live_valid1234567890abcdef",
+		claims: &shared.AuthClaims{
+			UserID:      saID,
+			TenantID:    tenantID,
+			ActorType:   shared.ActorTypeAPIKey,
+			Name:        "Test Bot",
+			Permissions: []string{"document:create"},
+		},
+		err: errors.New("invalid key"),
+	}
+
+	mw := middleware.AuthRequired(tokenMgr, validator)
+
+	// Test 1: X-API-Key header
+	t.Run("Valid X-API-Key", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/test", nil)
+		req.Header.Set("X-API-Key", "mrg_live_valid1234567890abcdef")
+		rec := httptest.NewRecorder()
+
+		var gotClaims *shared.AuthClaims
+		mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			gotClaims, _ = shared.GetAuthClaims(r.Context())
+			w.WriteHeader(http.StatusOK)
+		})).ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rec.Code)
+		}
+		if gotClaims == nil || gotClaims.ActorType != shared.ActorTypeAPIKey || gotClaims.UserID != saID {
+			t.Errorf("unexpected claims: %+v", gotClaims)
+		}
+	})
+
+	// Test 2: Authorization: Bearer mrg_live_...
+	t.Run("Valid Bearer API Key", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/test", nil)
+		req.Header.Set("Authorization", "Bearer mrg_live_valid1234567890abcdef")
+		rec := httptest.NewRecorder()
+
+		var gotClaims *shared.AuthClaims
+		mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			gotClaims, _ = shared.GetAuthClaims(r.Context())
+			w.WriteHeader(http.StatusOK)
+		})).ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusOK {
+			t.Fatalf("expected 200, got %d", rec.Code)
+		}
+		if gotClaims == nil || gotClaims.ActorType != shared.ActorTypeAPIKey {
+			t.Errorf("unexpected claims: %+v", gotClaims)
+		}
+	})
+
+	// Test 3: Invalid API Key
+	t.Run("Invalid API Key", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/test", nil)
+		req.Header.Set("X-API-Key", "mrg_live_invalid")
+		rec := httptest.NewRecorder()
+
+		mw(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})).ServeHTTP(rec, req)
+
+		if rec.Code != http.StatusUnauthorized {
+			t.Fatalf("expected 401, got %d", rec.Code)
+		}
+	})
 }
