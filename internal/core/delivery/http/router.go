@@ -27,6 +27,7 @@ type Handlers struct {
 	CustomFieldHandler  *v1.CustomFieldHandler
 	SequenceHandler     *v1.SequenceHandler
 	AttachmentHandler   *v1.AttachmentHandler
+	CommunicationHandler *v1.CommunicationHandler
 }
 
 // NewRouter constructs the Chi router with middleware and routes.
@@ -85,6 +86,9 @@ func NewRouter(db *pgxpool.Pool, handlers Handlers) http.Handler {
 		}
 		if handlers.AttachmentHandler != nil {
 			handlers.AttachmentHandler.RegisterRoutes(r)
+		}
+		if handlers.CommunicationHandler != nil {
+			handlers.CommunicationHandler.RegisterRoutes(r)
 		}
 		handlers.TenantHandler.RegisterRoutes(r)
 		handlers.OrganizationHandler.RegisterRoutes(r)

@@ -38,6 +38,22 @@ type AuditLog struct {
 	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 }
 
+type Comment struct {
+	ID         pgtype.UUID        `json:"id"`
+	TenantID   pgtype.UUID        `json:"tenant_id"`
+	EntityType string             `json:"entity_type"`
+	EntityID   pgtype.UUID        `json:"entity_id"`
+	AuthorID   pgtype.UUID        `json:"author_id"`
+	Type       string             `json:"type"`
+	Content    string             `json:"content"`
+	Mentions   []byte             `json:"mentions"`
+	ParentID   pgtype.UUID        `json:"parent_id"`
+	IsPinned   bool               `json:"is_pinned"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Contact struct {
 	ID             pgtype.UUID        `json:"id"`
 	TenantID       pgtype.UUID        `json:"tenant_id"`
@@ -151,6 +167,22 @@ type File struct {
 	Metadata      []byte             `json:"metadata"`
 	CreatedAt     pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Notification struct {
+	ID         pgtype.UUID        `json:"id"`
+	TenantID   pgtype.UUID        `json:"tenant_id"`
+	UserID     pgtype.UUID        `json:"user_id"`
+	ActorID    pgtype.UUID        `json:"actor_id"`
+	Type       string             `json:"type"`
+	Title      string             `json:"title"`
+	Message    string             `json:"message"`
+	EntityType string             `json:"entity_type"`
+	EntityID   pgtype.UUID        `json:"entity_id"`
+	IsRead     bool               `json:"is_read"`
+	ReadAt     pgtype.Timestamptz `json:"read_at"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 }
 
 type NumberSequence struct {

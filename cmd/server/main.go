@@ -16,6 +16,7 @@ import (
 	"github.com/akordium-id/mergiate-core/internal/core/repository/postgres"
 	attachmentusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/attachment"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/audit"
+	commusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/communication"
 	customfieldusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/customfield"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/document"
 	identityusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/identity"
@@ -77,6 +78,7 @@ func main() {
 	customFieldRepo := postgres.NewCustomFieldRepository(dbPool)
 	sequenceRepo := postgres.NewSequenceRepository(dbPool)
 	attachmentRepo := postgres.NewAttachmentRepository(dbPool)
+	commRepo := postgres.NewCommunicationRepository(dbPool)
 
 	// Pluggable Storage Driver
 	storageDriver, err := local.NewDriver("./storage/uploads")
@@ -106,6 +108,7 @@ func main() {
 	identityUsecase := identityusecase.NewUsecase(identityRepo, tenantRepo, tokenMgr, cfg.JWTExpiry)
 	customFieldUsecase := customfieldusecase.NewUsecase(customFieldRepo)
 	attachmentUsecase := attachmentusecase.NewUsecase(attachmentRepo, storageDriver)
+	commUsecase := commusecase.NewUsecase(commRepo, auditRepo, attachmentRepo, outboxRepo)
 
 	tenantHandler := v1.NewTenantHandler(tenantUsecase)
 	orgHandler := v1.NewOrganizationHandler(orgUsecase)
@@ -118,19 +121,21 @@ func main() {
 	customFieldHandler := v1.NewCustomFieldHandler(customFieldUsecase, tokenMgr)
 	sequenceHandler := v1.NewSequenceHandler(sequenceUsecase, tokenMgr)
 	attachmentHandler := v1.NewAttachmentHandler(attachmentUsecase, tokenMgr)
+	commHandler := v1.NewCommunicationHandler(commUsecase, tokenMgr)
 
 	handlers := deliveryhttp.Handlers{
-		TenantHandler:       tenantHandler,
-		OrganizationHandler: orgHandler,
-		PartyHandler:        partyHandler,
-		ProductHandler:      productHandler,
-		DocumentHandler:     docHandler,
-		AuditHandler:        auditHandler,
-		AuthHandler:         authHandler,
-		IdentityHandler:     identityHandler,
-		CustomFieldHandler:  customFieldHandler,
-		SequenceHandler:     sequenceHandler,
-		AttachmentHandler:   attachmentHandler,
+		TenantHandler:        tenantHandler,
+		OrganizationHandler:  orgHandler,
+		PartyHandler:         partyHandler,
+		ProductHandler:       productHandler,
+		DocumentHandler:      docHandler,
+		AuditHandler:         auditHandler,
+		AuthHandler:          authHandler,
+		IdentityHandler:      identityHandler,
+		CustomFieldHandler:   customFieldHandler,
+		SequenceHandler:      sequenceHandler,
+		AttachmentHandler:    attachmentHandler,
+		CommunicationHandler: commHandler,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)

@@ -121,6 +121,7 @@ Comprehensive guides and architectural specifications are available in the [`doc
 - [Custom Field & Extension Engine](docs/custom-fields.md)
 - [Document Numbering & Sequence Engine](docs/document-sequences.md)
 - [File & Attachment Engine](docs/file-and-attachment.md)
+- [Communication & Activity Timeline](docs/communication-and-notifications.md)
 - [Getting Started & Local Development](docs/getting-started.md)
 
 ---

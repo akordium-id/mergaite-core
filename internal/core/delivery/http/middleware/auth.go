@@ -54,6 +54,36 @@ func AuthRequired(tokenMgr auth.TokenManager) func(next http.Handler) http.Handl
 	}
 }
 
+// AuthOptional validates the JWT token if present, injecting claims without blocking unauthenticated requests.
+func AuthOptional(tokenMgr auth.TokenManager) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authHeader := r.Header.Get("Authorization")
+			if authHeader != "" {
+				parts := strings.SplitN(authHeader, " ", 2)
+				if len(parts) == 2 && strings.EqualFold(parts[0], "Bearer") {
+					tokenStr := strings.TrimSpace(parts[1])
+					if claims, err := tokenMgr.ValidateToken(tokenStr); err == nil && claims != nil {
+						ctx := shared.WithAuthClaims(r.Context(), &shared.AuthClaims{
+							UserID:      claims.UserID,
+							TenantID:    claims.TenantID,
+							Email:       claims.Email,
+							Name:        claims.Name,
+							Roles:       claims.Roles,
+							Permissions: claims.Permissions,
+						})
+						if claims.TenantID != shared.NilID() {
+							ctx = shared.WithTenantID(ctx, claims.TenantID)
+						}
+						r = r.WithContext(ctx)
+					}
+				}
+			}
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
 // RequirePermission verifies that the authenticated user possesses the specified permission code.
 func RequirePermission(permissionCode string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
