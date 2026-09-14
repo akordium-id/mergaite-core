@@ -31,17 +31,17 @@ func (h *ServiceAccountHandler) RegisterRoutes(r chi.Router) {
 	r.Route("/service-accounts", func(r chi.Router) {
 		r.Use(middleware.AuthRequired(h.tokenMgr, h.usecase))
 
-		r.With(middleware.RequireAnyPermission("service_account:read", "iam:manage", "*")).Get("/", h.ListServiceAccounts)
-		r.With(middleware.RequireAnyPermission("service_account:create", "iam:manage", "*")).Post("/", h.CreateServiceAccount)
-		r.With(middleware.RequireAnyPermission("service_account:read", "iam:manage", "*")).Get("/{id}", h.GetServiceAccount)
-		r.With(middleware.RequireAnyPermission("service_account:update", "iam:manage", "*")).Put("/{id}", h.UpdateServiceAccount)
-		r.With(middleware.RequireAnyPermission("service_account:delete", "iam:manage", "*")).Delete("/{id}", h.DeleteServiceAccount)
+		r.Get("/", h.ListServiceAccounts)
+		r.Post("/", h.CreateServiceAccount)
+		r.Get("/{id}", h.GetServiceAccount)
+		r.Put("/{id}", h.UpdateServiceAccount)
+		r.Delete("/{id}", h.DeleteServiceAccount)
 
 		// API Keys
 		r.Route("/{id}/keys", func(kr chi.Router) {
-			kr.With(middleware.RequireAnyPermission("api_key:read", "service_account:read", "iam:manage", "*")).Get("/", h.ListAPIKeys)
-			kr.With(middleware.RequireAnyPermission("api_key:create", "iam:manage", "*")).Post("/", h.CreateAPIKey)
-			kr.With(middleware.RequireAnyPermission("api_key:revoke", "iam:manage", "*")).Delete("/{keyId}", h.RevokeAPIKey)
+			kr.Get("/", h.ListAPIKeys)
+			kr.Post("/", h.CreateAPIKey)
+			kr.Delete("/{keyId}", h.RevokeAPIKey)
 		})
 	})
 }

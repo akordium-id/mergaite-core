@@ -186,31 +186,6 @@ func (u *usecase) Register(ctx context.Context, cmd RegisterCommand) (*identity.
 			Status:   identity.MembershipStatusActive,
 			JoinedAt: time.Now().UTC(),
 		})
-
-		// If this tenant has no roles yet, bootstrap the default Owner role with all system permissions
-		roles, err := u.identityRepo.ListRoles(ctx, *cmd.TenantID)
-		if err == nil && len(roles) == 0 {
-			allPerms, _ := u.identityRepo.ListPermissions(ctx)
-			permIDs := make([]shared.ID, len(allPerms))
-			for i, p := range allPerms {
-				permIDs[i] = p.ID
-			}
-			ownerRoleID, _ := shared.NewID()
-			ownerRole := &identity.Role{
-				ID:          ownerRoleID,
-				TenantID:    *cmd.TenantID,
-				Code:        "owner",
-				Name:        "Tenant Owner",
-				Description: "Default administrative owner of the tenant",
-				IsSystem:    true,
-				CreatedAt:   time.Now().UTC(),
-				UpdatedAt:   time.Now().UTC(),
-			}
-			if err := u.identityRepo.CreateRole(ctx, ownerRole); err == nil {
-				_ = u.identityRepo.AssignPermissionsToRole(ctx, ownerRole.ID, permIDs)
-				_ = u.identityRepo.AssignUserRole(ctx, *cmd.TenantID, user.ID, ownerRole.ID)
-			}
-		}
 	}
 
 	return user, nil
