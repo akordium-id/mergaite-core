@@ -95,10 +95,7 @@ func (r *partyRepository) GetByID(ctx context.Context, tenantID, id shared.ID) (
 }
 
 func (r *partyRepository) List(ctx context.Context, tenantID shared.ID, filter party.PartyFilter) ([]party.Party, int64, error) {
-	limit := filter.Limit
-	if limit <= 0 {
-		limit = 20
-	}
+	limit := max(filter.Limit, 20)
 	offset := max(filter.Offset, 0)
 
 	var typeStr *string

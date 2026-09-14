@@ -116,6 +116,7 @@ Comprehensive guides and architectural specifications are available in the [`doc
 - [Domain Primitives & Value Objects](docs/domain-primitives.md)
 - [Organization & Party Model](docs/organization-and-party.md)
 - [Product & Document Engine](docs/product-and-document.md)
+- [Audit Trail & Outbox Engine](docs/audit-and-event-outbox.md)
 - [Getting Started & Local Development](docs/getting-started.md)
 
 ---

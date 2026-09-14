@@ -138,10 +138,7 @@ func (r *documentRepository) GetDocumentByNumber(ctx context.Context, tenantID s
 }
 
 func (r *documentRepository) ListDocuments(ctx context.Context, tenantID shared.ID, filter document.DocumentFilter) ([]document.Document, int64, error) {
-	limit := filter.Limit
-	if limit <= 0 {
-		limit = 20
-	}
+	limit := max(filter.Limit, 20)
 	offset := max(filter.Offset, 0)
 
 	var orgID pgtype.UUID

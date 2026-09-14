@@ -3,8 +3,11 @@ package document_test
 import (
 	"context"
 	"testing"
+	"time"
 
+	domainaudit "github.com/akordium-id/mergaite-core/internal/core/domain/audit"
 	domaindoc "github.com/akordium-id/mergaite-core/internal/core/domain/document"
+	domainevent "github.com/akordium-id/mergaite-core/internal/core/domain/event"
 	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
 	usecasedoc "github.com/akordium-id/mergaite-core/internal/core/usecase/document"
 )
@@ -105,7 +108,7 @@ func (m *mockDocRepo) ListTransitions(ctx context.Context, tenantID, documentID 
 
 func TestDocumentUsecase_CreateDocumentWithLines(t *testing.T) {
 	repo := newMockDocRepo()
-	uc := usecasedoc.NewUsecase(repo)
+	uc := usecasedoc.NewUsecase(repo, nil, nil)
 
 	tenantID, _ := shared.NewID()
 	orgID, _ := shared.NewID()
@@ -163,7 +166,7 @@ func TestDocumentUsecase_CreateDocumentWithLines(t *testing.T) {
 
 func TestDocumentUsecase_TransitionWorkflow(t *testing.T) {
 	repo := newMockDocRepo()
-	uc := usecasedoc.NewUsecase(repo)
+	uc := usecasedoc.NewUsecase(repo, nil, nil)
 
 	tenantID, _ := shared.NewID()
 	orgID, _ := shared.NewID()
@@ -234,5 +237,101 @@ func TestDocumentUsecase_TransitionWorkflow(t *testing.T) {
 	}
 	if len(doc.Transitions) != 3 {
 		t.Errorf("expected 3 transition records, got %d", len(doc.Transitions))
+	}
+}
+
+type mockAuditRepo struct {
+	logs []domainaudit.AuditLog
+}
+
+func (m *mockAuditRepo) Create(ctx context.Context, log *domainaudit.AuditLog) error {
+	m.logs = append(m.logs, *log)
+	return nil
+}
+
+func (m *mockAuditRepo) List(ctx context.Context, tenantID shared.ID, filter domainaudit.Filter) ([]domainaudit.AuditLog, int64, error) {
+	return m.logs, int64(len(m.logs)), nil
+}
+
+type mockOutboxEventRepo struct {
+	events []domainevent.OutboxEvent
+}
+
+func (m *mockOutboxEventRepo) Create(ctx context.Context, evt *domainevent.OutboxEvent) error {
+	m.events = append(m.events, *evt)
+	return nil
+}
+
+func (m *mockOutboxEventRepo) FetchPending(ctx context.Context, maxRetries, limit int32) ([]domainevent.OutboxEvent, error) {
+	return m.events, nil
+}
+
+func (m *mockOutboxEventRepo) MarkPublished(ctx context.Context, id shared.ID, pub time.Time) error {
+	return nil
+}
+
+func (m *mockOutboxEventRepo) MarkFailed(ctx context.Context, id shared.ID, errMsg string) error {
+	return nil
+}
+
+func TestDocumentUsecase_AuditAndOutboxIntegration(t *testing.T) {
+	docRepo := newMockDocRepo()
+	auditRepo := &mockAuditRepo{}
+	outboxRepo := &mockOutboxEventRepo{}
+
+	uc := usecasedoc.NewUsecase(docRepo, auditRepo, outboxRepo)
+
+	tenantID, _ := shared.NewID()
+	orgID, _ := shared.NewID()
+	actorID, _ := shared.NewID()
+
+	ctx := shared.WithTenantID(context.Background(), tenantID)
+
+	// 1. Create Document -> should record 1 audit log and 1 outbox event
+	doc, err := uc.CreateDocument(ctx, usecasedoc.CreateDocumentCommand{
+		OrganizationID: orgID,
+		DocumentType:   domaindoc.DocTypeQuotation,
+		DocumentNumber: "QUO-001",
+		CreatedBy:      &actorID,
+	})
+	if err != nil {
+		t.Fatalf("failed to create document: %v", err)
+	}
+
+	if len(auditRepo.logs) != 1 {
+		t.Fatalf("expected 1 audit log, got %d", len(auditRepo.logs))
+	}
+	if auditRepo.logs[0].Action != domainaudit.ActionCreate {
+		t.Errorf("expected audit action 'create', got '%s'", auditRepo.logs[0].Action)
+	}
+	if len(outboxRepo.events) != 1 {
+		t.Fatalf("expected 1 outbox event, got %d", len(outboxRepo.events))
+	}
+	if outboxRepo.events[0].EventType != "document.created" {
+		t.Errorf("expected event_type 'document.created', got '%s'", outboxRepo.events[0].EventType)
+	}
+
+	// 2. Transition Document -> should record another audit log and another outbox event
+	_, err = uc.TransitionDocument(ctx, usecasedoc.TransitionDocumentCommand{
+		DocumentID:   doc.ID,
+		TargetStatus: domaindoc.StatusSubmitted,
+		Reason:       "Sending quotation to client",
+		ActorID:      &actorID,
+	})
+	if err != nil {
+		t.Fatalf("failed to transition document: %v", err)
+	}
+
+	if len(auditRepo.logs) != 2 {
+		t.Fatalf("expected 2 audit logs, got %d", len(auditRepo.logs))
+	}
+	if auditRepo.logs[1].Action != domainaudit.ActionTransition {
+		t.Errorf("expected audit action 'transition', got '%s'", auditRepo.logs[1].Action)
+	}
+	if len(outboxRepo.events) != 2 {
+		t.Fatalf("expected 2 outbox events, got %d", len(outboxRepo.events))
+	}
+	if outboxRepo.events[1].EventType != "document.transitioned" {
+		t.Errorf("expected event_type 'document.transitioned', got '%s'", outboxRepo.events[1].EventType)
 	}
 }

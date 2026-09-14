@@ -6,7 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/akordium-id/mergaite-core/internal/core/domain/audit"
 	"github.com/akordium-id/mergaite-core/internal/core/domain/document"
+	"github.com/akordium-id/mergaite-core/internal/core/domain/event"
 	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
 )
 
@@ -55,12 +57,16 @@ type Usecase interface {
 }
 
 type usecase struct {
-	docRepo document.Repository
+	docRepo    document.Repository
+	auditRepo  audit.Repository
+	outboxRepo event.OutboxRepository
 }
 
-func NewUsecase(docRepo document.Repository) Usecase {
+func NewUsecase(docRepo document.Repository, auditRepo audit.Repository, outboxRepo event.OutboxRepository) Usecase {
 	return &usecase{
-		docRepo: docRepo,
+		docRepo:    docRepo,
+		auditRepo:  auditRepo,
+		outboxRepo: outboxRepo,
 	}
 }
 
@@ -198,6 +204,50 @@ func (u *usecase) CreateDocument(ctx context.Context, cmd CreateDocumentCommand)
 		}
 	}
 
+	// Transactional Outbox Event
+	if u.outboxRepo != nil {
+		outboxID, _ := shared.NewID()
+		_ = u.outboxRepo.Create(ctx, &event.OutboxEvent{
+			ID:            outboxID,
+			TenantID:      tenantID,
+			EventType:     "document.created",
+			AggregateType: "document",
+			AggregateID:   docID,
+			Payload: map[string]any{
+				"document_id":     docID.String(),
+				"document_number": docNum,
+				"document_type":   string(docType),
+				"status":          string(doc.Status),
+				"total_amount":    total.Amount(),
+				"currency":        total.Currency(),
+			},
+			Status:    event.OutboxStatusPending,
+			CreatedAt: now,
+		})
+	}
+
+	// Append-only Audit Log
+	if u.auditRepo != nil {
+		auditID, _ := shared.NewID()
+		_ = u.auditRepo.Create(ctx, &audit.AuditLog{
+			ID:         auditID,
+			TenantID:   tenantID,
+			ActorID:    cmd.CreatedBy,
+			ActorType:  audit.ActorTypeUser,
+			Action:     audit.ActionCreate,
+			EntityType: "document",
+			EntityID:   docID,
+			Changes: map[string]any{
+				"document_number": docNum,
+				"document_type":   string(docType),
+				"status":          string(doc.Status),
+				"total_amount":    total.Amount(),
+				"currency":        total.Currency(),
+			},
+			CreatedAt: now,
+		})
+	}
+
 	return doc, nil
 }
 
@@ -289,6 +339,48 @@ func (u *usecase) TransitionDocument(ctx context.Context, cmd TransitionDocument
 
 	if err := u.docRepo.RecordTransition(ctx, trans); err != nil {
 		return nil, err
+	}
+
+	// Transactional Outbox Event
+	if u.outboxRepo != nil {
+		outboxID, _ := shared.NewID()
+		_ = u.outboxRepo.Create(ctx, &event.OutboxEvent{
+			ID:            outboxID,
+			TenantID:      tenantID,
+			EventType:     "document.transitioned",
+			AggregateType: "document",
+			AggregateID:   cmd.DocumentID,
+			Payload: map[string]any{
+				"document_id":     cmd.DocumentID.String(),
+				"document_number": doc.DocumentNumber,
+				"document_type":   string(doc.DocumentType),
+				"from_status":     string(doc.Status),
+				"to_status":       string(cmd.TargetStatus),
+				"reason":          cmd.Reason,
+			},
+			Status:    event.OutboxStatusPending,
+			CreatedAt: trans.CreatedAt,
+		})
+	}
+
+	// Append-only Audit Log
+	if u.auditRepo != nil {
+		auditID, _ := shared.NewID()
+		_ = u.auditRepo.Create(ctx, &audit.AuditLog{
+			ID:         auditID,
+			TenantID:   tenantID,
+			ActorID:    cmd.ActorID,
+			ActorType:  audit.ActorTypeUser,
+			Action:     audit.ActionTransition,
+			EntityType: "document",
+			EntityID:   cmd.DocumentID,
+			Changes: map[string]any{
+				"from_status": string(doc.Status),
+				"to_status":   string(cmd.TargetStatus),
+				"reason":      cmd.Reason,
+			},
+			CreatedAt: trans.CreatedAt,
+		})
 	}
 
 	// Refresh document state

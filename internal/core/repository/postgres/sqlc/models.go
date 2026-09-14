@@ -25,6 +25,19 @@ type Address struct {
 	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
 }
 
+type AuditLog struct {
+	ID         pgtype.UUID        `json:"id"`
+	TenantID   pgtype.UUID        `json:"tenant_id"`
+	ActorID    pgtype.UUID        `json:"actor_id"`
+	ActorType  string             `json:"actor_type"`
+	Action     string             `json:"action"`
+	EntityType string             `json:"entity_type"`
+	EntityID   pgtype.UUID        `json:"entity_id"`
+	Changes    []byte             `json:"changes"`
+	Metadata   []byte             `json:"metadata"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
 type Contact struct {
 	ID             pgtype.UUID        `json:"id"`
 	TenantID       pgtype.UUID        `json:"tenant_id"`
@@ -105,6 +118,20 @@ type OrganizationAddress struct {
 	AddressType    string             `json:"address_type"`
 	IsPrimary      bool               `json:"is_primary"`
 	CreatedAt      pgtype.Timestamptz `json:"created_at"`
+}
+
+type OutboxEvent struct {
+	ID            pgtype.UUID        `json:"id"`
+	TenantID      pgtype.UUID        `json:"tenant_id"`
+	EventType     string             `json:"event_type"`
+	AggregateType string             `json:"aggregate_type"`
+	AggregateID   pgtype.UUID        `json:"aggregate_id"`
+	Payload       []byte             `json:"payload"`
+	Status        string             `json:"status"`
+	RetryCount    int32              `json:"retry_count"`
+	ErrorMessage  *string            `json:"error_message"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	PublishedAt   pgtype.Timestamptz `json:"published_at"`
 }
 
 type Party struct {

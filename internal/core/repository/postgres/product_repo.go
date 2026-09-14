@@ -285,10 +285,7 @@ func (r *productRepository) GetProductBySKU(ctx context.Context, tenantID shared
 }
 
 func (r *productRepository) ListProducts(ctx context.Context, tenantID shared.ID, filter product.ProductFilter) ([]product.Product, int64, error) {
-	limit := filter.Limit
-	if limit <= 0 {
-		limit = 20
-	}
+	limit := max(filter.Limit, 20)
 	offset := max(filter.Offset, 0)
 
 	var typeStr *string

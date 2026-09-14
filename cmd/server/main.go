@@ -14,13 +14,16 @@ import (
 	deliveryhttp "github.com/akordium-id/mergaite-core/internal/core/delivery/http"
 	v1 "github.com/akordium-id/mergaite-core/internal/core/delivery/http/v1"
 	"github.com/akordium-id/mergaite-core/internal/core/repository/postgres"
+	"github.com/akordium-id/mergaite-core/internal/core/usecase/audit"
 	"github.com/akordium-id/mergaite-core/internal/core/usecase/document"
 	"github.com/akordium-id/mergaite-core/internal/core/usecase/organization"
 	"github.com/akordium-id/mergaite-core/internal/core/usecase/party"
 	"github.com/akordium-id/mergaite-core/internal/core/usecase/product"
 	"github.com/akordium-id/mergaite-core/internal/core/usecase/tenant"
+	"github.com/akordium-id/mergaite-core/internal/core/worker"
 	"github.com/akordium-id/mergaite-core/pkg/config"
 	"github.com/akordium-id/mergaite-core/pkg/database"
+	"github.com/akordium-id/mergaite-core/pkg/eventbus"
 )
 
 func main() {
@@ -62,18 +65,30 @@ func main() {
 	unitRepo := postgres.NewUnitRepository(dbPool)
 	productRepo := postgres.NewProductRepository(dbPool)
 	docRepo := postgres.NewDocumentRepository(dbPool)
+	auditRepo := postgres.NewAuditRepository(dbPool)
+	outboxRepo := postgres.NewOutboxRepository(dbPool)
+
+	// Event Bus & Background Outbox Worker
+	bus := eventbus.NewInMemoryBus()
+	outboxWorker := worker.NewOutboxWorker(outboxRepo, bus, worker.DefaultConfig())
+
+	workerCtx, workerCancel := context.WithCancel(context.Background())
+	defer workerCancel()
+	go outboxWorker.Start(workerCtx)
 
 	tenantUsecase := tenant.NewUsecase(tenantRepo)
 	orgUsecase := organization.NewUsecase(orgRepo)
 	partyUsecase := party.NewUsecase(partyRepo, contactRepo)
 	productUsecase := product.NewUsecase(unitRepo, productRepo)
-	docUsecase := document.NewUsecase(docRepo)
+	docUsecase := document.NewUsecase(docRepo, auditRepo, outboxRepo)
+	auditUsecase := audit.NewUsecase(auditRepo)
 
 	tenantHandler := v1.NewTenantHandler(tenantUsecase)
 	orgHandler := v1.NewOrganizationHandler(orgUsecase)
 	partyHandler := v1.NewPartyHandler(partyUsecase)
 	productHandler := v1.NewProductHandler(productUsecase)
 	docHandler := v1.NewDocumentHandler(docUsecase)
+	auditHandler := v1.NewAuditHandler(auditUsecase)
 
 	handlers := deliveryhttp.Handlers{
 		TenantHandler:       tenantHandler,
@@ -81,6 +96,7 @@ func main() {
 		PartyHandler:        partyHandler,
 		ProductHandler:      productHandler,
 		DocumentHandler:     docHandler,
+		AuditHandler:        auditHandler,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)
@@ -102,6 +118,7 @@ func main() {
 		sig := <-quit
 
 		slog.Info("received shutdown signal", slog.String("signal", sig.String()))
+		workerCancel()
 
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer shutdownCancel()
