@@ -52,6 +52,24 @@ type Contact struct {
 	UpdatedAt      pgtype.Timestamptz `json:"updated_at"`
 }
 
+type CustomFieldDefinition struct {
+	ID              pgtype.UUID        `json:"id"`
+	TenantID        pgtype.UUID        `json:"tenant_id"`
+	EntityType      string             `json:"entity_type"`
+	Code            string             `json:"code"`
+	Name            string             `json:"name"`
+	Description     *string            `json:"description"`
+	DataType        string             `json:"data_type"`
+	Options         []byte             `json:"options"`
+	IsRequired      bool               `json:"is_required"`
+	DefaultValue    []byte             `json:"default_value"`
+	ValidationRules []byte             `json:"validation_rules"`
+	SortOrder       int32              `json:"sort_order"`
+	IsActive        bool               `json:"is_active"`
+	CreatedAt       pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt       pgtype.Timestamptz `json:"updated_at"`
+}
+
 type Document struct {
 	ID             pgtype.UUID        `json:"id"`
 	TenantID       pgtype.UUID        `json:"tenant_id"`
@@ -95,6 +113,16 @@ type DocumentTransition struct {
 	Reason     *string            `json:"reason"`
 	ActorID    pgtype.UUID        `json:"actor_id"`
 	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
+type EntityCustomField struct {
+	ID         pgtype.UUID        `json:"id"`
+	TenantID   pgtype.UUID        `json:"tenant_id"`
+	EntityType string             `json:"entity_type"`
+	EntityID   pgtype.UUID        `json:"entity_id"`
+	Values     []byte             `json:"values"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
 }
 
 type Organization struct {

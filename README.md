@@ -118,6 +118,7 @@ Comprehensive guides and architectural specifications are available in the [`doc
 - [Product & Document Engine](docs/product-and-document.md)
 - [Audit Trail & Outbox Engine](docs/audit-and-event-outbox.md)
 - [Identity & Access Management (RBAC)](docs/identity-and-access.md)
+- [Custom Field & Extension Engine](docs/custom-fields.md)
 - [Getting Started & Local Development](docs/getting-started.md)
 
 ---

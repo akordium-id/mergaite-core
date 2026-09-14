@@ -24,6 +24,7 @@ type Handlers struct {
 	AuditHandler        *v1.AuditHandler
 	AuthHandler         *v1.AuthHandler
 	IdentityHandler     *v1.IdentityHandler
+	CustomFieldHandler  *v1.CustomFieldHandler
 }
 
 // NewRouter constructs the Chi router with middleware and routes.
@@ -73,6 +74,9 @@ func NewRouter(db *pgxpool.Pool, handlers Handlers) http.Handler {
 		}
 		if handlers.IdentityHandler != nil {
 			handlers.IdentityHandler.RegisterRoutes(r)
+		}
+		if handlers.CustomFieldHandler != nil {
+			handlers.CustomFieldHandler.RegisterRoutes(r)
 		}
 		handlers.TenantHandler.RegisterRoutes(r)
 		handlers.OrganizationHandler.RegisterRoutes(r)

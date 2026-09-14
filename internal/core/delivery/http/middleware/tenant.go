@@ -13,6 +13,12 @@ const HeaderTenantID = "X-Tenant-ID"
 func TenantRequired() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			// If tenant is already established in context (e.g. via JWT AuthRequired), proceed
+			if id, ok := shared.GetTenantID(r.Context()); ok && id != shared.NilID() {
+				next.ServeHTTP(w, r)
+				return
+			}
+
 			rawID := r.Header.Get(HeaderTenantID)
 			if rawID == "" {
 				response.Err(w, http.StatusBadRequest, "TENANT_REQUIRED", "Missing X-Tenant-ID header")

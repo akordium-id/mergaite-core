@@ -15,6 +15,7 @@ import (
 	v1 "github.com/akordium-id/mergiate-core/internal/core/delivery/http/v1"
 	"github.com/akordium-id/mergiate-core/internal/core/repository/postgres"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/audit"
+	customfieldusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/customfield"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/document"
 	identityusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/identity"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/organization"
@@ -70,6 +71,7 @@ func main() {
 	auditRepo := postgres.NewAuditRepository(dbPool)
 	outboxRepo := postgres.NewOutboxRepository(dbPool)
 	identityRepo := postgres.NewIdentityRepository(dbPool)
+	customFieldRepo := postgres.NewCustomFieldRepository(dbPool)
 
 	// Auth & Security Token Manager
 	tokenMgr := auth.NewTokenManager(cfg.JWTSecret, cfg.AppName)
@@ -89,6 +91,7 @@ func main() {
 	docUsecase := document.NewUsecase(docRepo, auditRepo, outboxRepo)
 	auditUsecase := audit.NewUsecase(auditRepo)
 	identityUsecase := identityusecase.NewUsecase(identityRepo, tenantRepo, tokenMgr, cfg.JWTExpiry)
+	customFieldUsecase := customfieldusecase.NewUsecase(customFieldRepo)
 
 	tenantHandler := v1.NewTenantHandler(tenantUsecase)
 	orgHandler := v1.NewOrganizationHandler(orgUsecase)
@@ -98,6 +101,7 @@ func main() {
 	auditHandler := v1.NewAuditHandler(auditUsecase)
 	authHandler := v1.NewAuthHandler(identityUsecase, tokenMgr)
 	identityHandler := v1.NewIdentityHandler(identityUsecase, tokenMgr)
+	customFieldHandler := v1.NewCustomFieldHandler(customFieldUsecase, tokenMgr)
 
 	handlers := deliveryhttp.Handlers{
 		TenantHandler:       tenantHandler,
@@ -108,6 +112,7 @@ func main() {
 		AuditHandler:        auditHandler,
 		AuthHandler:         authHandler,
 		IdentityHandler:     identityHandler,
+		CustomFieldHandler:  customFieldHandler,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)
