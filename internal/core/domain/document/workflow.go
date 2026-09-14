@@ -2,6 +2,7 @@ package document
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
 )
@@ -35,12 +36,7 @@ func IsValidTransition(from, to Status) bool {
 	if !exists {
 		return false
 	}
-	for _, s := range allowed {
-		if s == to {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(allowed, to)
 }
 
 // AllowedTransitions returns the list of allowed target statuses from the current status.

@@ -289,10 +289,7 @@ func (r *productRepository) ListProducts(ctx context.Context, tenantID shared.ID
 	if limit <= 0 {
 		limit = 20
 	}
-	offset := filter.Offset
-	if offset < 0 {
-		offset = 0
-	}
+	offset := max(filter.Offset, 0)
 
 	var typeStr *string
 	if filter.Type != nil {

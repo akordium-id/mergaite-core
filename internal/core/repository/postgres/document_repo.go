@@ -142,10 +142,7 @@ func (r *documentRepository) ListDocuments(ctx context.Context, tenantID shared.
 	if limit <= 0 {
 		limit = 20
 	}
-	offset := filter.Offset
-	if offset < 0 {
-		offset = 0
-	}
+	offset := max(filter.Offset, 0)
 
 	var orgID pgtype.UUID
 	if filter.OrganizationID != nil && *filter.OrganizationID != shared.NilID() {
