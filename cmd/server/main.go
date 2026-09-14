@@ -14,6 +14,7 @@ import (
 	deliveryhttp "github.com/akordium-id/mergiate-core/internal/core/delivery/http"
 	v1 "github.com/akordium-id/mergiate-core/internal/core/delivery/http/v1"
 	"github.com/akordium-id/mergiate-core/internal/core/repository/postgres"
+	attachmentusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/attachment"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/audit"
 	customfieldusecase "github.com/akordium-id/mergiate-core/internal/core/usecase/customfield"
 	"github.com/akordium-id/mergiate-core/internal/core/usecase/document"
@@ -28,6 +29,7 @@ import (
 	"github.com/akordium-id/mergiate-core/pkg/config"
 	"github.com/akordium-id/mergiate-core/pkg/database"
 	"github.com/akordium-id/mergiate-core/pkg/eventbus"
+	"github.com/akordium-id/mergiate-core/pkg/storage/local"
 )
 
 func main() {
@@ -74,6 +76,14 @@ func main() {
 	identityRepo := postgres.NewIdentityRepository(dbPool)
 	customFieldRepo := postgres.NewCustomFieldRepository(dbPool)
 	sequenceRepo := postgres.NewSequenceRepository(dbPool)
+	attachmentRepo := postgres.NewAttachmentRepository(dbPool)
+
+	// Pluggable Storage Driver
+	storageDriver, err := local.NewDriver("./storage/uploads")
+	if err != nil {
+		slog.Error("failed to initialize storage driver", slog.Any("error", err))
+		os.Exit(1)
+	}
 
 	// Auth & Security Token Manager
 	tokenMgr := auth.NewTokenManager(cfg.JWTSecret, cfg.AppName)
@@ -95,6 +105,7 @@ func main() {
 	auditUsecase := audit.NewUsecase(auditRepo)
 	identityUsecase := identityusecase.NewUsecase(identityRepo, tenantRepo, tokenMgr, cfg.JWTExpiry)
 	customFieldUsecase := customfieldusecase.NewUsecase(customFieldRepo)
+	attachmentUsecase := attachmentusecase.NewUsecase(attachmentRepo, storageDriver)
 
 	tenantHandler := v1.NewTenantHandler(tenantUsecase)
 	orgHandler := v1.NewOrganizationHandler(orgUsecase)
@@ -106,6 +117,7 @@ func main() {
 	identityHandler := v1.NewIdentityHandler(identityUsecase, tokenMgr)
 	customFieldHandler := v1.NewCustomFieldHandler(customFieldUsecase, tokenMgr)
 	sequenceHandler := v1.NewSequenceHandler(sequenceUsecase, tokenMgr)
+	attachmentHandler := v1.NewAttachmentHandler(attachmentUsecase, tokenMgr)
 
 	handlers := deliveryhttp.Handlers{
 		TenantHandler:       tenantHandler,
@@ -118,6 +130,7 @@ func main() {
 		IdentityHandler:     identityHandler,
 		CustomFieldHandler:  customFieldHandler,
 		SequenceHandler:     sequenceHandler,
+		AttachmentHandler:   attachmentHandler,
 	}
 
 	router := deliveryhttp.NewRouter(dbPool, handlers)

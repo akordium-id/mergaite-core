@@ -115,6 +115,18 @@ type DocumentTransition struct {
 	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 }
 
+type EntityAttachment struct {
+	ID         pgtype.UUID        `json:"id"`
+	TenantID   pgtype.UUID        `json:"tenant_id"`
+	FileID     pgtype.UUID        `json:"file_id"`
+	EntityType string             `json:"entity_type"`
+	EntityID   pgtype.UUID        `json:"entity_id"`
+	Purpose    string             `json:"purpose"`
+	Title      string             `json:"title"`
+	SortOrder  int32              `json:"sort_order"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
+}
+
 type EntityCustomField struct {
 	ID         pgtype.UUID        `json:"id"`
 	TenantID   pgtype.UUID        `json:"tenant_id"`
@@ -123,6 +135,22 @@ type EntityCustomField struct {
 	Values     []byte             `json:"values"`
 	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+}
+
+type File struct {
+	ID            pgtype.UUID        `json:"id"`
+	TenantID      pgtype.UUID        `json:"tenant_id"`
+	StorageDriver string             `json:"storage_driver"`
+	StoragePath   string             `json:"storage_path"`
+	Filename      string             `json:"filename"`
+	MimeType      string             `json:"mime_type"`
+	SizeBytes     int64              `json:"size_bytes"`
+	Sha256Hash    string             `json:"sha256_hash"`
+	UploadedBy    pgtype.UUID        `json:"uploaded_by"`
+	IsPublic      bool               `json:"is_public"`
+	Metadata      []byte             `json:"metadata"`
+	CreatedAt     pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt     pgtype.Timestamptz `json:"updated_at"`
 }
 
 type NumberSequence struct {
