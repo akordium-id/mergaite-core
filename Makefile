@@ -2,7 +2,7 @@
 
 export PATH := $(PATH):$(HOME)/go/bin
 
-DB_URL ?= postgres://mergaite:mergaite_password@localhost:5434/mergaite_core?sslmode=disable
+DB_URL ?= postgres://mergiate:mergiate_password@localhost:5434/mergiate_core?sslmode=disable
 
 run:
 	go run ./cmd/server

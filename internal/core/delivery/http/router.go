@@ -10,9 +10,9 @@ import (
 	"github.com/go-chi/cors"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/akordium-id/mergaite-core/internal/core/delivery/http/middleware"
-	v1 "github.com/akordium-id/mergaite-core/internal/core/delivery/http/v1"
-	"github.com/akordium-id/mergaite-core/pkg/response"
+	"github.com/akordium-id/mergiate-core/internal/core/delivery/http/middleware"
+	v1 "github.com/akordium-id/mergiate-core/internal/core/delivery/http/v1"
+	"github.com/akordium-id/mergiate-core/pkg/response"
 )
 
 type Handlers struct {

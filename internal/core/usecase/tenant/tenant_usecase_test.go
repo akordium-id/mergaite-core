@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	"github.com/akordium-id/mergaite-core/internal/core/usecase/tenant"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/usecase/tenant"
 )
 
 type mockTenantRepo struct {

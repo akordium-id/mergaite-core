@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/contact"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/party"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	partyuc "github.com/akordium-id/mergaite-core/internal/core/usecase/party"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/contact"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/party"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	partyuc "github.com/akordium-id/mergiate-core/internal/core/usecase/party"
 )
 
 type mockPartyRepo struct {

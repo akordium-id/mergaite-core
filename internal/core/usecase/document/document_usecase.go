@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/audit"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/document"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/event"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/audit"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/document"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/event"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 type CreateDocumentLineInput struct {

@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/contact"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/party"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/contact"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/party"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 type CreatePartyCommand struct {

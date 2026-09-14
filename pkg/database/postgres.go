@@ -8,7 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/akordium-id/mergaite-core/pkg/config"
+	"github.com/akordium-id/mergiate-core/pkg/config"
 )
 
 // NewPostgresPool initializes a pgx connection pool with health checking.

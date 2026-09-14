@@ -1,6 +1,6 @@
 # Mergiate Core: Domain Primitives & Value Objects
 
-This document explains the usage and safety guarantees of the core Domain Value Objects located in [`internal/core/domain/shared/`](file:///home/orin/code/archive/mergaite-core/internal/core/domain/shared/).
+This document explains the usage and safety guarantees of the core Domain Value Objects located in [`internal/core/domain/shared/`](file:///home/orin/code/archive/mergiate-core/internal/core/domain/shared/).
 
 ---
 
@@ -9,7 +9,7 @@ This document explains the usage and safety guarantees of the core Domain Value 
 Mergiate Core uses **UUIDv7** for universal entity identification.
 
 ```go
-import "github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+import "github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 
 // Generate a new time-ordered UUIDv7
 id, err := shared.NewID()

@@ -36,7 +36,7 @@ Mergiate Core provides the essential primitives, domain boundaries, and multi-te
 ## Directory Structure
 
 ```
-mergaite-core/
+mergiate-core/
 ├── cmd/
 │   └── server/                         # Main HTTP application entrypoint
 ├── internal/

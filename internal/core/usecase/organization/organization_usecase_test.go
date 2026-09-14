@@ -5,9 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/organization"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	organizationuc "github.com/akordium-id/mergaite-core/internal/core/usecase/organization"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/organization"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	organizationuc "github.com/akordium-id/mergiate-core/internal/core/usecase/organization"
 )
 
 type mockOrgRepo struct {

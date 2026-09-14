@@ -3,8 +3,8 @@ package party_test
 import (
 	"testing"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/party"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/party"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 func TestParty_HasRole(t *testing.T) {

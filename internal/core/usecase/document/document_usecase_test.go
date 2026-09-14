@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	domainaudit "github.com/akordium-id/mergaite-core/internal/core/domain/audit"
-	domaindoc "github.com/akordium-id/mergaite-core/internal/core/domain/document"
-	domainevent "github.com/akordium-id/mergaite-core/internal/core/domain/event"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	usecasedoc "github.com/akordium-id/mergaite-core/internal/core/usecase/document"
+	domainaudit "github.com/akordium-id/mergiate-core/internal/core/domain/audit"
+	domaindoc "github.com/akordium-id/mergiate-core/internal/core/domain/document"
+	domainevent "github.com/akordium-id/mergiate-core/internal/core/domain/event"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	usecasedoc "github.com/akordium-id/mergiate-core/internal/core/usecase/document"
 )
 
 type mockDocRepo struct {

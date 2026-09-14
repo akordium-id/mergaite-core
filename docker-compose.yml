@@ -1,25 +1,25 @@
 services:
   postgres:
     image: postgres:17-alpine
-    container_name: mergaite_postgres
+    container_name: mergiate_postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ${DB_USER:-mergaite}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-mergaite_password}
-      POSTGRES_DB: ${DB_NAME:-mergaite_core}
+      POSTGRES_USER: ${DB_USER:-mergiate}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mergiate_password}
+      POSTGRES_DB: ${DB_NAME:-mergiate_core}
     ports:
       - "${DB_PORT:-5434}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-mergaite} -d ${DB_NAME:-mergaite_core}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-mergiate} -d ${DB_NAME:-mergiate_core}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
   redis:
     image: redis:7-alpine
-    container_name: mergaite_redis
+    container_name: mergiate_redis
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6380}:6379"

@@ -25,13 +25,13 @@ func Load() (*Config, error) {
 
 	appEnv := getEnv("APP_ENV", "development")
 	appPort := getEnv("APP_PORT", "8080")
-	appName := getEnv("APP_NAME", "mergaite-core")
+	appName := getEnv("APP_NAME", "mergiate-core")
 
 	dbHost := getEnv("DB_HOST", "localhost")
 	dbPort := getEnv("DB_PORT", "5434")
-	dbUser := getEnv("DB_USER", "mergaite")
-	dbPass := getEnv("DB_PASSWORD", "mergaite_password")
-	dbName := getEnv("DB_NAME", "mergaite_core")
+	dbUser := getEnv("DB_USER", "mergiate")
+	dbPass := getEnv("DB_PASSWORD", "mergiate_password")
+	dbName := getEnv("DB_NAME", "mergiate_core")
 	dbSSL := getEnv("DB_SSLMODE", "disable")
 
 	dbURL := os.Getenv("DATABASE_URL")

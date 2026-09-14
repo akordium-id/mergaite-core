@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/akordium-id/mergaite-core/internal/core/delivery/http/middleware"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/delivery/http/middleware"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 func TestTenantRequired_MissingHeader(t *testing.T) {

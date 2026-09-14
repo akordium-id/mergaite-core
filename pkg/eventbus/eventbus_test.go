@@ -6,9 +6,9 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/event"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	"github.com/akordium-id/mergaite-core/pkg/eventbus"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/event"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/pkg/eventbus"
 )
 
 func TestInMemoryBus_ExactAndWildcardSubscriptions(t *testing.T) {

@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/event"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	"github.com/akordium-id/mergaite-core/internal/core/worker"
-	"github.com/akordium-id/mergaite-core/pkg/eventbus"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/event"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/worker"
+	"github.com/akordium-id/mergiate-core/pkg/eventbus"
 )
 
 type mockOutboxRepo struct {

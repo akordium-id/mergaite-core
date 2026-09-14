@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 var validTransitions = map[Status][]Status{

@@ -3,7 +3,7 @@ package event
 import (
 	"time"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 // Event is the interface that all domain events in Mergiate must satisfy.

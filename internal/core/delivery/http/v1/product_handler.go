@@ -7,11 +7,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/akordium-id/mergaite-core/internal/core/delivery/http/middleware"
-	domainproduct "github.com/akordium-id/mergaite-core/internal/core/domain/product"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	"github.com/akordium-id/mergaite-core/internal/core/usecase/product"
-	"github.com/akordium-id/mergaite-core/pkg/response"
+	"github.com/akordium-id/mergiate-core/internal/core/delivery/http/middleware"
+	domainproduct "github.com/akordium-id/mergiate-core/internal/core/domain/product"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/usecase/product"
+	"github.com/akordium-id/mergiate-core/pkg/response"
 )
 
 type ProductHandler struct {

@@ -3,8 +3,8 @@ package organization_test
 import (
 	"testing"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/organization"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/organization"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 func TestOrganization_CheckCircularReference(t *testing.T) {

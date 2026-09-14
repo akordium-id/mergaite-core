@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	domainaudit "github.com/akordium-id/mergaite-core/internal/core/domain/audit"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	usecaseaudit "github.com/akordium-id/mergaite-core/internal/core/usecase/audit"
+	domainaudit "github.com/akordium-id/mergiate-core/internal/core/domain/audit"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	usecaseaudit "github.com/akordium-id/mergiate-core/internal/core/usecase/audit"
 )
 
 type mockAuditRepo struct {

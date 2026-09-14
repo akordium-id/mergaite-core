@@ -1,4 +1,4 @@
-module github.com/akordium-id/mergaite-core
+module github.com/akordium-id/mergiate-core
 
 go 1.26.0
 

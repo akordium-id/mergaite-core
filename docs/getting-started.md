@@ -25,14 +25,14 @@ Default configuration variables:
 ```dotenv
 APP_ENV=development
 APP_PORT=8080
-APP_NAME=mergaite-core
+APP_NAME=mergiate-core
 
 # PostgreSQL 17
 DB_HOST=localhost
 DB_PORT=5434
-DB_USER=mergaite
-DB_PASSWORD=mergaite_password
-DB_NAME=mergaite_core
+DB_USER=mergiate
+DB_PASSWORD=mergiate_password
+DB_NAME=mergiate_core
 DB_SSLMODE=disable
 
 # Redis 7

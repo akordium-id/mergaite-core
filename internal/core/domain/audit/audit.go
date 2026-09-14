@@ -3,7 +3,7 @@ package audit
 import (
 	"time"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 type Action string

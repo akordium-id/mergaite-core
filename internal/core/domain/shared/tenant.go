@@ -31,7 +31,7 @@ func (t Tenant) IsActive() bool {
 type contextKey string
 
 const (
-	tenantIDContextKey contextKey = "mergaite.tenant_id"
+	tenantIDContextKey contextKey = "mergiate.tenant_id"
 )
 
 // WithTenantID stores the Tenant ID in the given context.

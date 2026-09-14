@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5/middleware"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 // RequestLogger returns a Chi middleware that logs HTTP requests using slog.

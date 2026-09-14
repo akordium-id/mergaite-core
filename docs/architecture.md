@@ -101,7 +101,7 @@ Tenant
 ```
 
 ### Context Propagation
-The HTTP layer extracts the tenant identity via the `X-Tenant-ID` header using [`TenantRequired()`](file:///home/orin/code/archive/mergaite-core/internal/core/delivery/http/middleware/tenant.go) middleware and injects it into `context.Context`:
+The HTTP layer extracts the tenant identity via the `X-Tenant-ID` header using [`TenantRequired()`](file:///home/orin/code/archive/mergiate-core/internal/core/delivery/http/middleware/tenant.go) middleware and injects it into `context.Context`:
 
 ```go
 ctx := shared.WithTenantID(r.Context(), tenantID)

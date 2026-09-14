@@ -6,11 +6,11 @@ import (
 
 	"github.com/go-chi/chi/v5"
 
-	"github.com/akordium-id/mergaite-core/internal/core/delivery/http/middleware"
-	domainaudit "github.com/akordium-id/mergaite-core/internal/core/domain/audit"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
-	"github.com/akordium-id/mergaite-core/internal/core/usecase/audit"
-	"github.com/akordium-id/mergaite-core/pkg/response"
+	"github.com/akordium-id/mergiate-core/internal/core/delivery/http/middleware"
+	domainaudit "github.com/akordium-id/mergiate-core/internal/core/domain/audit"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/usecase/audit"
+	"github.com/akordium-id/mergiate-core/pkg/response"
 )
 
 type AuditHandler struct {

@@ -4,8 +4,8 @@ import (
 	"math"
 	"testing"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/product"
-	"github.com/akordium-id/mergaite-core/internal/core/domain/shared"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/product"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/shared"
 )
 
 func TestConvert(t *testing.T) {

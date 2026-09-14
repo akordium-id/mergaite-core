@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/akordium-id/mergaite-core/internal/core/domain/event"
+	"github.com/akordium-id/mergiate-core/internal/core/domain/event"
 )
 
 type Config struct {
